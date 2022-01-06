@@ -70,14 +70,14 @@ function click (node) {
 // We just need to check for 'Safari' because all other browsers (besides Firefox) include that too
 // https://www.whatismybrowser.com/guides/the-latest-user-agent/macos
 var isMacOSWebView = _global.navigator && /Macintosh/.test(navigator.userAgent) && /AppleWebKit/.test(navigator.userAgent) && !/Safari/.test(navigator.userAgent)
-
+var isChromeIOS = /CriOS\/[\d]+/.test(navigator.userAgent)
 var saveAs = _global.saveAs || (
   // probably in some web worker
   (typeof window !== 'object' || window !== _global)
     ? function saveAs () { /* noop */ }
 
   // Use download attribute first if possible (#193 Lumia mobile) unless this is a macOS WebView
-  : ('download' in HTMLAnchorElement.prototype && !isMacOSWebView)
+  : ('download' in HTMLAnchorElement.prototype && !isMacOSWebView && !isChromeIOS)
   ? function saveAs (blob, name, opts) {
     var URL = _global.URL || _global.webkitURL
     var a = document.createElement('a')
@@ -140,7 +140,6 @@ var saveAs = _global.saveAs || (
 
     var force = blob.type === 'application/octet-stream'
     var isSafari = /constructor/i.test(_global.HTMLElement) || _global.safari
-    var isChromeIOS = /CriOS\/[\d]+/.test(navigator.userAgent)
 
     if ((isChromeIOS || (force && isSafari) || isMacOSWebView) && typeof FileReader !== 'undefined') {
       // Safari doesn't allow downloading of blob URLs
